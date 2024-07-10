@@ -34,3 +34,7 @@ LIBS += $$SDL2_PATH/bin/SDL2.dll
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    Style.qrc \
+    image.qrc

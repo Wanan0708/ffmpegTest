@@ -7,6 +7,9 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->setWindowTitle("录音机1.0");
+    this->setWindowIcon(QIcon(":/new/prefix1/image/recorder.png"));
+
     qDebug() << "ffmpeg version: " << avcodec_version();
 
     recordFlag = true;
@@ -24,6 +27,9 @@ Widget::Widget(QWidget *parent)
         playThread->wait();
         playThread->deleteLater();
     });
+
+    ui->pushButton_play->setObjectName("pushButton");
+    ui->pushButton_record->setObjectName("pushbutton1");
 }
 
 Widget::~Widget()
@@ -31,11 +37,18 @@ Widget::~Widget()
     delete ui;
 }
 
-
+//开始录音
 void Widget::on_pushButton_record_clicked()
 {
     if (recordFlag)
     {
+        QString filter = "pcm files (*.pcm)";
+        QString savePath = QFileDialog::getSaveFileName(nullptr, "选择保存音频位置", "./", "All Files (*.*);pcm Files (*.pcm)", &filter);
+        if (!savePath.isEmpty())
+        {
+            qDebug() << "选择的文件路径为：" << savePath;
+        }
+        audioThread->setSaveAudioPath(savePath);
         audioThread->setRecordFlag(true);
         audioThread->start();
         recordFlag = false;
@@ -51,9 +64,18 @@ void Widget::on_pushButton_record_clicked()
     }
 }
 
-
+//播放录音
 void Widget::on_pushButton_play_clicked()
 {
+    QString filePath = QFileDialog::getOpenFileName(nullptr, "选择音频文件", "./", "All Files (*.*);pcm Files (*.pcm)");
+    QFile audioFile(filePath);
+    if (!audioFile.exists())
+    {
+        qDebug() << "音频文件不存在";
+        return;
+    }
+
+    playThread->setAudioPath(filePath);
     if (playFlag)
     {
         playThread->setPlayFlag(true);

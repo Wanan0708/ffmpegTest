@@ -6,6 +6,11 @@ PlayThread::PlayThread(QObject *parent) : QThread(parent)
     bPlay = false;
 }
 
+PlayThread::~PlayThread()
+{
+    delete userData;
+}
+
 void _audioCallback(void *userdata, Uint8 *stream, int len)
 {
     SDL_memset(stream, 0, len);
@@ -38,7 +43,7 @@ void PlayThread::run()
     spc.samples = 1024;
     spc.userdata = this->userData;
 
-    QFile file("./audio.pcm");
+    QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
     {
         SDL_Quit();
@@ -70,4 +75,9 @@ void PlayThread::run()
 void PlayThread::setPlayFlag(bool flag)
 {
     this->bPlay = flag;
+}
+
+void PlayThread::setAudioPath(QString path)
+{
+    this->filePath = path;
 }

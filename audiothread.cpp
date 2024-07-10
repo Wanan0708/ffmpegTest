@@ -6,6 +6,11 @@ AudioThread::AudioThread(QObject *parent) : QThread(parent)
     qDebug() << "thread strating..." << this->currentThreadId();
 }
 
+AudioThread::~AudioThread()
+{
+
+}
+
 void AudioThread::run()
 {
 //    avcodec_register_all();
@@ -26,7 +31,7 @@ void AudioThread::run()
         return;
     }
 
-    QFile audioFile("./audio.pcm");
+    QFile audioFile(filePath);
     if (!audioFile.open(QIODevice::WriteOnly))
     {
         qDebug() << "filed to open audioFile;";
@@ -48,4 +53,9 @@ void AudioThread::run()
 void AudioThread::setRecordFlag(bool flag)
 {
     this->bFlag = flag;
+}
+
+void AudioThread::setSaveAudioPath(QString path)
+{
+    this->filePath = path;
 }

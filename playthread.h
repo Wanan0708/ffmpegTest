@@ -19,14 +19,17 @@ class PlayThread : public QThread
     Q_OBJECT
 public:
     explicit PlayThread(QObject *parent = nullptr);
+    ~PlayThread();
     void run() override;
     void setPlayFlag(bool flag);
+    void setAudioPath(QString path);
 
 signals:
 
 private:
     UserData *userData;
     bool bPlay;
+    QString filePath;
 };
 
 //void _audioCallback(void *userdata, Uint8 *stream, int len);

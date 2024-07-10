@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QDebug>
+#include <QFileDialog>
 #include "audiothread.h"
 #include "playthread.h"
 

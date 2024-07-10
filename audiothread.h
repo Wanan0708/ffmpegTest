@@ -18,11 +18,14 @@ class AudioThread : public QThread
     Q_OBJECT
 public:
     explicit AudioThread(QObject *parent = nullptr);
+    ~AudioThread();
     void run() override;
     void setRecordFlag(bool flag);
+    void setSaveAudioPath(QString path);
 
 private:
     bool bFlag;
+    QString filePath;
 
 signals:
 
