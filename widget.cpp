@@ -24,12 +24,25 @@ Widget::Widget(QWidget *parent)
     playThread = new PlayThread(this);
     connect(this, &QWidget::destroyed, [=](){
         playThread->exit();
-        playThread->wait();
+        playThread->wait(3000);
         playThread->deleteLater();
     });
+    connect(playThread, &PlayThread::finished, [=](){
+        playThread->exit();
+        if (playThread->wait(3000))
+        {
+            playThread->terminate();
+        }
+    });
+    connect(playThread, &PlayThread::fileToEndSig, [=]()
+    {
+        playThread->exit();
+        playThread->wait(3000);
+        ui->pushButton_play->setText("开始播放");
+    });
 
-    ui->pushButton_play->setObjectName("pushButton");
-    ui->pushButton_record->setObjectName("pushbutton1");
+    ui->pushButton_play->setObjectName("pushButton"); //使用样式pushbutton
+    ui->pushButton_record->setObjectName("pushbutton1");//使用样式pushbutton
 }
 
 Widget::~Widget()
@@ -48,6 +61,10 @@ void Widget::on_pushButton_record_clicked()
         {
             qDebug() << "选择的文件路径为：" << savePath;
         }
+        else
+        {
+            return;
+        }
         audioThread->setSaveAudioPath(savePath);
         audioThread->setRecordFlag(true);
         audioThread->start();
@@ -58,7 +75,9 @@ void Widget::on_pushButton_record_clicked()
     {
         audioThread->setRecordFlag(false);
         audioThread->exit();
-        audioThread->wait(3000);
+        if (!audioThread->wait(2000)) {
+            audioThread->terminate(); // 如果超时，可以选择终止线程
+        }
         recordFlag = true;
         ui->pushButton_record->setText("开始录音");
     }
@@ -67,6 +86,17 @@ void Widget::on_pushButton_record_clicked()
 //播放录音
 void Widget::on_pushButton_play_clicked()
 {
+    //停止播放
+    if (playThread->isRunning())
+    {
+        playThread->setPlayFlag(false);
+//        playThread->exit();
+//        playThread->wait();
+        ui->pushButton_play->setText("开始播放");
+        return ;
+    }
+
+    //选择要播放的音频文件
     QString filePath = QFileDialog::getOpenFileName(nullptr, "选择音频文件", "./", "All Files (*.*);pcm Files (*.pcm)");
     QFile audioFile(filePath);
     if (!audioFile.exists())
@@ -80,6 +110,7 @@ void Widget::on_pushButton_play_clicked()
     {
         playThread->setPlayFlag(true);
         playThread->start();
+        ui->pushButton_play->setText("停止播放");
     }
     else
     {

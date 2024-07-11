@@ -61,15 +61,19 @@ void PlayThread::run()
         QCoreApplication::processEvents();
         if (userData->len <= 0)
         {
+            emit fileToEndSig();
             break;
         }
-        userData->data = (Uint8*)audio_buf; //static_cast<Uint8*>(audio_buf);
+        userData->data = (Uint8*)audio_buf;
         while (userData->len > 0 && bPlay) {
             qDebug() << "ret" << ret++;
             SDL_Delay(1);
             QCoreApplication::processEvents();
         }
     }
+
+    SDL_PauseAudio(1);
+    emit fileToEndSig();
 }
 
 void PlayThread::setPlayFlag(bool flag)

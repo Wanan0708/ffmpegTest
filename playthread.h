@@ -25,6 +25,7 @@ public:
     void setAudioPath(QString path);
 
 signals:
+    void fileToEndSig();
 
 private:
     UserData *userData;
